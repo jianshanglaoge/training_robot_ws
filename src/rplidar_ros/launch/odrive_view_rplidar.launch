@@ -1,0 +1,44 @@
+<!--
+  Used for visualising rplidar in action.  
+  
+  It requires rplidar.launch.
+ -->
+<launch>
+
+  <!-- rviz is used for read rviz config-->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/sss.rviz" />
+
+  <!-- teleop pkg is used for send comment in /cmd_vel to control the motor-->
+  <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard"  type="teleop_twist_keyboard.py"/>
+
+  <!-- urdf and following nodes are used for robot description-->
+  <param name="robot_description" textfile="/home/wang/training_robot_ws/src/test.urdf"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <arg name="gui" default="true" />
+
+  <!-- motor controller node is used for transport data from /cmd_vel to /odom-->
+  <node name="motor_controller_interface" pkg="bobdabest" type="motor-controller-interface.py" />
+
+  <!-- filter the laser to the -pi to pi, the output valus should be posed on /scan_filtered-->
+  <include file="$(find laser_filters)/examples/test.launch" />
+
+  <!-- slam gmmaping config-->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+    <remap from="scan" to="scan_filtered"/>
+  </node>
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" clear_params="true">
+    <rosparam file="$(find rplidar_ros)/params/move_base_params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find rplidar_ros)/params/move_base_params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find rplidar_ros)/params/move_base_params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rplidar_ros)/params/move_base_params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find rplidar_ros)/params/move_base_params/base_local_planner_params.yaml" command="load" />
+    <param name="controller_frequency" value="20.0"/>
+    <param name="controller_patiente" value="15.0"/>
+  </node>
+
+</launch>
+
+
+

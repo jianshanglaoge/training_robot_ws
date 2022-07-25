@@ -1,0 +1,8 @@
+prefix=/home/wang/training_robot_ws/install
+
+Name: bobdabest
+Description: Description of bobdabest
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

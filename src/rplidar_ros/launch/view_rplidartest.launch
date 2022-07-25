@@ -1,0 +1,14 @@
+<!--
+  Used for visualising rplidar in action.  
+  
+  It requires rplidar.launch.
+ -->
+<launch>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/sss.rviz" />
+  <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard"  type="teleop_twist_keyboard.py"/>
+  <param name="robot_description" textfile="/home/wang/tutorial_ws/src/test.urdf"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+</launch>
+
